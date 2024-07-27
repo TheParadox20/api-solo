@@ -32,7 +32,7 @@ class MenuController extends Controller
             array(
               "icon" => "icon-[fluent--sport-hockey-24-regular]",
               "text" => "NHL",
-              "sport" => "Hockey",
+              "sport" => "Ice Hockey",
             ),
           );
           

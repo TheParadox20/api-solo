@@ -14,6 +14,10 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('name');
+            $table->string('country')->nullable();
+            $table->foreignId('sport_id')->constrained('sports');
+            $table->double('popularity');
         });
     }
 

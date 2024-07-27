@@ -4,10 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Games extends Model
 {
     use HasFactory;
-    protected $fillable = ['sport_id', 'category_id','country_id','amount','stakers','start_time','end_time','match','popularity'];
-    public static function create(){}
+    protected $fillable = ['sport_id', 'category_id','amount','stakers','start_time','options' ,'outcomes','popularity','gameID'];
+    public static function create($game){
+        $row = new Games();
+        $row->sport_id = $game->sport;
+        $row->category_id = $game->category;
+        $row->amount = 0.0;
+        $row->stakers = 0;
+        $row->start_time = $game->date . " " . $game->time;
+        $row->popularity = 0.0;
+        $row->options = json_encode($game->options);
+        $row->outcomes = json_encode($game->outcomes);
+        $game->generateID();
+        $row->gameID = $game->gameID;
+        $row->save();
+        Log::info("{$game->options[0]} ::VS:: {$game->options[1]} on {$game->date} at {$game->time}");
+    }
 }

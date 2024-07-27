@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('games', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->integer('sport_id');
-            $table->integer('category_id');
-            $table->integer('country_id');
+            $table->foreignId('sport_id')->constrained('sports');
+            $table->foreignId('category_id')->constrained('categories');
             $table->double('amount');
             $table->integer('stakers');
             $table->dateTime('start_time');
-            $table->dateTime('end_time');
-            $table->json('match');
+            $table->json('options');
+            $table->json('outcomes');
             $table->double('popularity');
+            $table->string('gameID');
         });
     }
 
