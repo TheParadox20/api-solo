@@ -22,7 +22,7 @@ return new class extends Migration
             $table->json('options');
             $table->json('outcomes');
             $table->double('popularity');
-            $table->string('gameID');
+            $table->string('gameID')->unique();
         });
     }
 

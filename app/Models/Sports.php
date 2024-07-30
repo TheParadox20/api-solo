@@ -12,10 +12,15 @@ class Sports extends Model
     protected $fillable = ['name','popularity'];
     public static function create($name){
         $sport = new Sports();
-        $sport->name = $name=='Soccer'?'Football':$name;
+        $name = 'Soccer'==$name?'Football':$name;
+        $sport->name = $name;
         $sport->popularity = 0.0;
+        $exists = Sports::where('name', $name)->first();
+        if($exists){
+            return;
+        }
         $sport->save();
-        Log::info("\n" . $name . " :: sport added\n");
+        Log::info("\n\n" . $name . " :: sport added\n");
     }
     public static function getID($name){
         $sport = Sports::where('name', $name)->first();

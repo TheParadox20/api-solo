@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
 use App\CustomTypes\GameType;
 use App\Models\Sports;
 use App\Models\Categories;
@@ -13,67 +14,17 @@ class GamesController extends Controller
 {
     public function home(Request $request)
     {
-        $popular = array(
-            "Football" => array(
-              "icon" => "icon-[tabler--ball-football]",
-              "data" => array(
-                array(
-                  "category" => "Premier league",
-                  "options" => array("Manchester United", "Arsenal"),
-                  "outcomes" => array(
-                    array(
-                      "name" => "Man. United",
-                      "stake" => 2500,
-                      "users" => 38,
-                    ),
-                    array(
-                      "name" => "Draw",
-                      "stake" => 1950,
-                      "users" => 21,
-                    ),
-                    array(
-                      "name" => "Arsenal",
-                      "stake" => 3705,
-                      "users" => 64,
-                    ),
-                  ),
-                  "date" => "Sat 12th Jun",
-                  "time" => "15:00 pm",
-                  "stakes" => 7955,
-                ),
-              ),
-            ),
-            "Basketball" => array(
-              "icon" => "icon-[fluent--sport-basketball-24-regular]",
-              "data" => array(
-                array(
-                  "icon" => "basketball",
-                  "category" => "NBA",
-                  "options" => array("Lakers", "Clippers"),
-                  "outcomes" => array(
-                    array(
-                      "name" => "Lakers",
-                      "stake" => 2500,
-                      "users" => 38,
-                    ),
-                    array(
-                      "name" => "Draw",
-                      "stake" => 1950,
-                      "users" => 21,
-                    ),
-                    array(
-                      "name" => "Clippers",
-                      "stake" => 3705,
-                      "users" => 64,
-                    ),
-                  ),
-                  "date" => "Sat 12th Jun",
-                  "time" => "15:00 pm",
-                  "stakes" => 7955,
-                ),
-              ),
-            ),
-        );
+        $sports = Sports::orderByDesc('popularity')->take(2)->get(['id','name']);
+        $popular = [];
+        foreach ($sports as $sport) {
+          $games = Games::where('sport_id',$sport['id'])
+                                          ->orderByDesc('popularity')
+                                          ->take(2)
+                                          ->get('id');
+          $popular[$sport['name']] = array_map(function($game){
+            return \GameType::fromID($game['id'])->package();
+          }, $games->toArray());
+        }
         return response()->json($popular);
     }
     public function games(Request $request)
@@ -118,6 +69,53 @@ class GamesController extends Controller
         return response()->json([
           "categories" => $categories,
           "games" => $games,
+        ]);
+    }
+    public function pull(Request $request)
+    {
+        $client = new Client();
+        $sportsURL = 'https://api.betika.com/v1/sports';
+        $response = $client->request('GET', $sportsURL);
+        $body = $response->getBody();
+        $content = json_decode($body->getContents());
+        foreach($content->data as $sport){//fetch sports
+            $sport_id = $sport->sport_id;
+            Sports::create($sport->sport_name);
+            foreach($sport->categories as $category){
+                foreach($category->competitions as $competition){
+                    Categories::create($competition->competition_name, Sports::getID($sport->sport_name=='Soccer'?'Football':$sport->sport_name));
+                }
+            }
+            $periods = [-1,1,2,3,4,5,6,7];
+            foreach($periods as $period){//fetch matches
+                $sport_url = "https://api.betika.com/v1/uo/matches?period_id=" . $period . "&sport_id=" . $sport_id;
+                $response = $client->request('GET', $sport_url);
+                $body = $response->getBody();
+                $matches = json_decode($body->getContents());
+                foreach($matches->data as $match){// loop through indiviadual games
+                    try{
+                        $outcomes = [
+                            ['name'=>$match->home_team,'stake'=>0.0,'users'=>0,'odd'=>$match->home_odd],
+                            ['name'=>'draw','stake'=>0.0,'users'=>0,'odd'=>$match->neutral_odd],
+                            ['name'=>$match->away_team,'stake'=>0.0,'users'=>0,'odd'=>$match->away_odd]
+                        ];
+                        $game = new \GameType(
+                            Sports::getID($sport->sport_name=='Soccer'?'Football':$sport->sport_name),
+                            Categories::getID($match->competition_name),
+                            $match->start_time,
+                            [$match->home_team,$match->away_team],
+                            $outcomes
+                        );
+                        Games::create($game);
+                    } catch(\Exception $e){
+                        Log::info($e->getMessage());
+                    }
+                    // break;
+                }
+            }
+        }
+        return response()->json([
+            'message'=> 'done'
         ]);
     }
 }

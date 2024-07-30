@@ -21,6 +21,7 @@ class Games extends Model
         $row->options = json_encode($game->options);
         $row->outcomes = json_encode($game->outcomes);
         $game->generateID();
+        if(Games::where('gameID', $game->gameID)->first()) return;
         $row->gameID = $game->gameID;
         $row->save();
         Log::info("{$game->options[0]} ::VS:: {$game->options[1]} on {$game->date} at {$game->time}");

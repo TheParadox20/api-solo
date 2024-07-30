@@ -11,12 +11,18 @@ class Categories extends Model
     use HasFactory;
     protected $fillable = ['name', 'sport_id','country','popularity'];
     public static function create($name, $sport){
-        Log::info("\t- " . $name);
         $category = new Categories();
         $category->name = $name;
         $category->sport_id = $sport;
         $category->popularity = 0.0;
+        $exists = Categories::where('name', $name)
+                    ->where('sport_id', $sport)
+                    ->first();
+        if($exists){
+            return;
+        }
         $category->save();
+        Log::info("\t- " . $name);
     }
     /**
      * A static function that the id given the category name

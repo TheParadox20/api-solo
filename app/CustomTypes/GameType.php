@@ -15,6 +15,7 @@ class GameType
     public $options = ['',''];
     public $outcomes = [array(['name'=>'','stake'=>0.0,'users'=>0,'odd'=>0.0]),array(['name'=>'','stake'=>0.0,'users'=>0,'odd'=>0.0])];
     public $gameID = '';
+    public $id = 0;
 
     function __construct(
         $sport,
@@ -34,11 +35,31 @@ class GameType
         $this->outcomes = $outcomes;
     }
     /**
-     * Static function that generates a unique id for the game
+     * Function that generates a unique id for the game
      */
     public function generateID(){
-        $id = md5($this->options[0] . $this->options[1] . $this->date . $this->time);
-        $this->gameID = substr($id, 0, 5);
+        $this->gameID = md5($this->options[0] . $this->options[1] . $this->date . $this->time);
+    }
+    /**
+     * Function that sets ID
+     */
+    public function setID($id){
+        $this->gameID =$id;
+    }
+
+    /**
+     * Function that sets ID
+     */
+    public function setRow($id){
+        $this->id =$id;
+    }
+
+    public function setStakes($stakes){
+        $this->stakes =$stakes;
+    }
+
+    public function setStakers($users){
+        $this->users =$users;
     }
 
     /**
@@ -53,14 +74,36 @@ class GameType
      */
     public static function fromID($id){
         $game = Games::find($id);
-        Log::info($game);
-        return new GameType(
+        $Game = new GameType(
             $game->sport_id,
             $game->category_id,
             $game->start_time,
             $game->options,
             $game->outcomes,
         );
+        $Game->setID($game->gameID);
+        $Game->setRow($id);
+        $Game->setStakers($game->stakers);
+        $Game->setStakes($game->amount);
+        return $Game;
+    }
+
+    /**
+     * function to modify a record on placing a bet
+     */
+    public function update($choice, $amount){
+        $game = Games::find($this->id);
+        $outcomes = json_decode($game->outcomes);
+        $outcome = $outcomes[$choice];
+        // update outcome
+        $outcome->stake = $outcome->stake+$amount;
+        $outcome->users = $amount>0?$outcome->users+1:$outcome->users-1;
+        $outcomes[$choice] = $outcome;
+        $game->outcomes = json_encode($outcomes);
+        $game->stakers = $amount>0?$game->stakers+1:$game->stakers-1;
+        $game->amount = $game->amount + $amount;
+        echo json_encode($outcomes);
+        $game->save();
     }
 
     /**
@@ -76,7 +119,7 @@ class GameType
             'time' => $this->time,
             'options' => json_decode($this->options),
             'outcomes' => json_decode($this->outcomes),
-            'id' => $this->gameID
+            'id' => $this->id
         ];
     }
 }

@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('bets', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('game_id')->constrained('games');
+            $table->double('amount');
+            $table->boolean('status')->nullable(); // not started, issue, success
+            $table->boolean('result')->nullable(); // true if win false otherwies
             $table->timestamps();
         });
     }
