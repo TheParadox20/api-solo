@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('game_id')->constrained('games');
             $table->double('amount');
-            $table->boolean('status')->nullable(); // not started, issue, success
+            $table->boolean('status')->nullable(); // pending, disputed, success
             $table->boolean('result')->nullable(); // true if win false otherwies
             $table->timestamps();
         });

@@ -21,7 +21,7 @@ class Bets extends Model
         $bet->game_id = $game;
         $bet->amount = $amount;
         //update user balance
-        $user->balance = $user->balance - $amount;
+        $user->balance -= $amount;
         //update game stats
         $Game = \GameType::fromID($game);
         $Game->setRow($game);

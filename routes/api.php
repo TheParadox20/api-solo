@@ -8,6 +8,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\GamesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BetsController;
+use App\Http\Controllers\BotsController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -22,9 +23,15 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 Route::post('/signin', [UserController::class, 'signin']);
 Route::post('/signup', [UserController::class, 'signup']);
+// bots related routes
+Route::get('/bots', [BotsController::class, 'index']);
+Route::get('/bots/bets', [BotsController::class, 'index']);
+Route::post('/bots/create', [BotsController::class, 'create']);
 // menu related routes
 Route::get('/menu', [MenuController::class, 'menu']);
 // games related routes
+Route::get('/games/all', [GamesController::class, 'index']);
 Route::get('/home', [GamesController::class, 'home']);
 Route::get('/games', [GamesController::class, 'games']);
 Route::get('/games/pull', [GamesController::class, 'pull']);
+Route::post('/games/create', [GamesController::class, 'create']);

@@ -61,6 +61,9 @@ class GameType
     public function setStakers($users){
         $this->users =$users;
     }
+    public function getName(){
+        return "{$this->options[0]} vs {$this->options[1]}";
+    }
 
     /**
      * Return all the data in json format
