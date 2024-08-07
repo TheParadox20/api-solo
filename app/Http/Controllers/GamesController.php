@@ -49,6 +49,7 @@ class GamesController extends Controller
         $games = Games::where('sport_id',$sport['id'])
                       ->where('start_time','>',date('Y-m-d H:i:s'))
                       ->orderByDesc('popularity')
+                      ->orderBy('start_time')
                       ->take(2)
                       ->get(['id']);
         $popular[$sport['name']] = array_map(function($game){
@@ -77,6 +78,10 @@ class GamesController extends Controller
           $games[$date] = Games::where('start_time','like',$dates[$i].'%')
                                       ->take(90)
                                       ->where('start_time','>',date('Y-m-d H:i:s'))
+                                      ->whereAny(['options',],'LIKE' , '%'.$request->search.'%')
+                                      ->skip(0)
+                                      ->orderByDesc('popularity')
+                                      ->orderBy('start_time')
                                       ->when(count($path)>=2, function($query) use ($path){
                                         return $query->where('sport_id',Sports::getID($path[1]));
                                       })
