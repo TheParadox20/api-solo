@@ -45,10 +45,12 @@ class GamesController extends Controller
       $sports = Sports::orderByDesc('popularity')->take(2)->get(['id','name']);
       $popular = [];
       foreach ($sports as $sport) {
+        // games where start_time is greater than now
         $games = Games::where('sport_id',$sport['id'])
-                                        ->orderByDesc('popularity')
-                                        ->take(2)
-                                        ->get('id');
+                      ->where('start_time','>',date('Y-m-d H:i:s'))
+                      ->orderByDesc('popularity')
+                      ->take(2)
+                      ->get(['id']);
         $popular[$sport['name']] = array_map(function($game){
         return \GameType::fromID($game['id'])->package();
         }, $games->toArray());
@@ -74,6 +76,7 @@ class GamesController extends Controller
           $date = $date->format('l, jS F Y');
           $games[$date] = Games::where('start_time','like',$dates[$i].'%')
                                       ->take(90)
+                                      ->where('start_time','>',date('Y-m-d H:i:s'))
                                       ->when(count($path)>=2, function($query) use ($path){
                                         return $query->where('sport_id',Sports::getID($path[1]));
                                       })
