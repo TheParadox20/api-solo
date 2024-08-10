@@ -15,6 +15,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 // test routes
 Route::get('/test/books', [TestController::class, 'books']);
+Route::get('/test/live', [TestController::class, 'live']);
 // user related routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [UserController::class, 'index']);
@@ -27,6 +28,7 @@ Route::post('/signup', [UserController::class, 'signup']);
 Route::get('/bots', [BotsController::class, 'index']);
 Route::get('/bots/bets', [BotsController::class, 'index']);
 Route::post('/bots/create', [BotsController::class, 'create']);
+Route::post('/bots/bet/place', [BetsController::class, 'place']);
 // menu related routes
 Route::get('/menu', [MenuController::class, 'menu']);
 // games related routes

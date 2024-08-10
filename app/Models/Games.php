@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 class Games extends Model
 {
     use HasFactory;
-    protected $fillable = ['sport_id', 'category_id','amount','stakers','start_time','options' ,'outcomes','popularity','gameID'];
+    protected $fillable = ['sport_id', 'category_id','amount','stakers','start_time','options' ,'outcomes','popularity','gameID','results'];
     public static function create($game): Games | null
     {
         $row = new Games();

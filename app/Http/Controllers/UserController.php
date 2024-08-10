@@ -39,6 +39,7 @@ class UserController extends Controller
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 return response()->json([
+                    'message' => 'Account created',
                     'token' => $token
                 ]);
             }
@@ -70,6 +71,7 @@ class UserController extends Controller
             $token = $user->createToken('auth_token')->plainTextToken;
 
             return response()->json([
+                'message' => 'Successful signin',
                 'token' => $token,
                 'name' => $user->name,
                 'balance' => $user->balance,

@@ -19,4 +19,86 @@ class TestController extends Controller
         $books = Books::all();
         return response()->json($books);
     }
+    /**
+     * Summary of live
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function live(Request $request)
+    {
+        $client = new Client();
+        $url = 'https://live.betika.com/v1/uo/matches';
+        $params = ['page' => 1];
+        $count = 0;
+        $games = [];
+
+        try {
+            while (true) {
+                $response = $client->get($url, ['query' => $params]);
+                $data = json_decode($response->getBody()->getContents(), true);
+                
+                if (empty($data['data'])) {
+                    break;
+                }
+
+                foreach ($data['data'] as $match) {
+                    $home_team = $match['home_team'] ?? 'N/A';
+                    $away_team = $match['away_team'] ?? 'N/A';
+                    $current_score = $match['current_score'] ?? 'N/A';
+                    $match_time = $match['match_time'] ?? 'N/A';
+                    $competition_name = $match['competition_name'] ?? 'N/A';
+                    $nation = $match['category'] ?? 'N/A';
+                    $sport_name = $match['sport_name'] ?? 'N/A';
+
+                    if ($match_time === '0' || $match_time === 'N/A' || $match_time === null) {
+                        $match_time = 'Time Unknown';
+                    }
+
+                    if ($current_score === '-:-') {
+                        if ($match_time === 'Time Unknown') {
+                            $match_status = 'Score Available but Time Unknown';
+                        } else {
+                            $match_status = 'Score Unavailable';
+                        }
+                    } else {
+                        if ($match_time === 'Time Unknown') {
+                            $match_status = 'Score Available but Time Unknown';
+                        } else {
+                            $match_status = 'Live';
+                        }
+                    }
+
+                    $count++;
+
+                    // Log the information using Log::info()
+                    Log::info("Sport: {$sport_name}");
+                    Log::info("Match: {$home_team} vs {$away_team}");
+                    Log::info("Score: {$current_score}");
+                    Log::info("Time: {$match_time}");
+                    Log::info("Competition: {$competition_name}");
+                    Log::info("Nation: {$nation}");
+                    Log::info("Status: {$match_status}");
+                    Log::info(str_repeat("-", 50));
+                    $games[] = [
+                        'sport_name' => $sport_name,
+                        'home_team' => $home_team,
+                        'away_team' => $away_team,
+                        'current_score' => $current_score,
+                        'match_time' => $match_time,
+                        'competition_name' => $competition_name,
+                        'nation' => $nation,
+                        'match_status' => $match_status
+                    ];
+                }
+
+                $params['page'] += 1;
+            }
+
+            Log::info("Matches fetched: {$count}");
+            return response()->json($games);
+
+        } catch (\Exception $e) {
+            Log::error("Error fetching data: " . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while fetching data']);
+        }
+    }
 }

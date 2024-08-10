@@ -105,7 +105,8 @@ class GameType
         $game->outcomes = json_encode($outcomes);
         $game->stakers = $amount>0?$game->stakers+1:$game->stakers-1;
         $game->amount = $game->amount + $amount;
-        echo json_encode($outcomes);
+        //update popularity
+        $game->popularity = $game->popularity + $amount;
         $game->save();
     }
 
