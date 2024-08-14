@@ -8,6 +8,7 @@ use App\Models\Sports;
 use App\Models\Categories;
 use App\Models\Games;
 use App\Models\Bets;
+use App\Models\Live;
 
 class BetsController extends Controller
 {
@@ -37,8 +38,36 @@ class BetsController extends Controller
         try{
             $user = $request->user();
             throw_if(!$user, \Exception::class, 'User unauthenticated');
-            return response()->json([
-            ]);
+            $bets = [];
+            $bets = Bets::where('user_id', $user->id)->where('status', null)->get();
+            $bets = $bets->map(function($bet){
+                $game = \GameType::fromID($bet->game_id);
+                $game->setRow($bet->game_id);
+                $live = Live::where('game_id', $bet->game_id)->first();
+                $status = $live?
+                [
+                    'name' => 'Live',
+                    'homeScore' => $live->home_score,
+                    'awayScore' => $live->away_score,
+                    'time' => $live->time
+                ]:
+                [
+                    'name' => 'Pending',
+                    'homeScore' => 0,
+                    'awayScore' => 0,
+                ];
+                return [
+                    'id' => $bet->id,
+                    'homeTeam' => $game->options[0],
+                    'awayTeam' => $game->options[1],
+                    'start' => $game->time,
+                    'stake' => $bet->amount,
+                    'choice' => $game->outcomes[$bet->choice]->name,
+                    'payout' => $game->getPayout($bet->choice, $bet->amount),
+                    'status' => $status
+                ];
+            });
+            return response()->json($bets);
         } catch (\Exception $e) {
             return response()->json([ 
                 'error' => $e->getMessage(),

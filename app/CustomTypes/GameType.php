@@ -81,8 +81,8 @@ class GameType
             $game->sport_id,
             $game->category_id,
             $game->start_time,
-            $game->options,
-            $game->outcomes,
+            json_decode($game->options),
+            json_decode($game->outcomes),
         );
         $Game->setID($game->gameID);
         $Game->setRow($id);
@@ -121,9 +121,19 @@ class GameType
             'users' => $this->users,
             'date' => $this->date,
             'time' => $this->time,
-            'options' => json_decode($this->options),
-            'outcomes' => json_decode($this->outcomes),
+            'options' => $this->options,
+            'outcomes' => $this->outcomes,
             'id' => $this->id
         ];
+    }
+
+    /**
+     * Function to get payout given stake and choice
+     */
+    public function getPayout($choice, $stake){
+        $stakes = $this->outcomes[$choice]->stake;
+        $pot = $this->stakes-$stakes;
+        $award = ($stake/$stakes*$pot)+$stake;
+        return $award;
     }
 }

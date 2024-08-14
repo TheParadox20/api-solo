@@ -86,7 +86,7 @@ class GamesController extends Controller
                                         return $query->where('sport_id',Sports::getID($path[1]));
                                       })
                                       ->when(count($path)>=3, function($query) use ($path){
-                                        return $query->where('category_id',Categories::getID($path[2]));
+                                        return $query->where('category_id',Categories::getID($path[2],Sports::getID($path[1])));
                                       })
                                       ->get('id');
           $dates[$i] = $date;
@@ -125,7 +125,7 @@ class GamesController extends Controller
       ];
       $game = new \GameType(
           Sports::getID($request->sport),
-          Categories::getID($request->category),
+          Categories::getID($request->category,Sports::getID($request->sport)),
           $request->start_time,
           [$request->home_team,$request->away_team],
           $outcomes
@@ -139,7 +139,7 @@ class GamesController extends Controller
       Log::info($e->getMessage());
   }
   }
-  public function pull(Request $request)
+  public static function pull()
   {
       $client = new Client();
       $sportsURL = 'https://api.betika.com/v1/sports';
@@ -164,12 +164,12 @@ class GamesController extends Controller
                   try{
                       $outcomes = [
                           ['name'=>$match->home_team,'stake'=>0.0,'users'=>0,'odd'=>$match->home_odd],
-                          ['name'=>'draw','stake'=>0.0,'users'=>0,'odd'=>$match->neutral_odd],
+                          ['name'=>'Draw','stake'=>0.0,'users'=>0,'odd'=>$match->neutral_odd],
                           ['name'=>$match->away_team,'stake'=>0.0,'users'=>0,'odd'=>$match->away_odd]
                       ];
                       $game = new \GameType(
                           Sports::getID($sport->sport_name=='Soccer'?'Football':$sport->sport_name),
-                          Categories::getID($match->competition_name),
+                          Categories::getID($match->competition_name,Sports::getID($sport->sport_name=='Soccer'?'Football':$sport->sport_name)),
                           $match->start_time,
                           [$match->home_team,$match->away_team],
                           $outcomes

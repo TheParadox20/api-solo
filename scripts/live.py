@@ -20,6 +20,7 @@ while True:
         competition_name = match.get('competition_name', 'N/A')
         nation = match.get('category', 'N/A')
         sport_name = match.get('sport_name', 'N/A')
+        start_time = match.get('start_time')
 
         if match_time in ['0', 'N/A', None]:
             match_time = 'Time Unknown'
@@ -42,6 +43,7 @@ while True:
         print(f"Sport: {sport_name}")
         print(f"Match: {home_team} vs {away_team}")
         print(f"Score: {current_score}")
+        print(f"Start: {start_time}")
         print(f"Time: {match_time}")
         print(f"Competition: {competition_name}")
         print(f"Nation: {nation}")

@@ -24,6 +24,7 @@ class Sports extends Model
     }
     public static function getID($name){
         $sport = Sports::where('name', $name)->first();
+        throw_if(!$sport, \Exception::class, "Sport not found");
         return $sport->id;
     }
     public static function getName($id){

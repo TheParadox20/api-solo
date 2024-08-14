@@ -11,7 +11,7 @@ use App\Models\User;
 class Bets extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'game_id', 'amount', 'status', 'result'];
+    protected $fillable = ['user_id', 'game_id', 'market', 'choice', 'amount', 'status', 'result'];
     public static function create($user, $game, $amount, $choice){
         throw_if(Bets::where('game_id', $game)->where('user_id', $user)->first(), \Exception::class, 'Bet exists');
         $user = User::find($user);
@@ -19,6 +19,7 @@ class Bets extends Model
         $bet = new Bets();
         $bet->user_id = $user->id;
         $bet->game_id = $game;
+        $bet->choice = $choice;
         $bet->amount = $amount;
         //update user balance
         $user->balance -= $amount;

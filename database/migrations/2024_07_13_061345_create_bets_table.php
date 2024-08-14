@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('game_id')->constrained('games');
+            $table->string('market')->default('3 way');
+            $table->string('choice');
             $table->double('amount');
             $table->boolean('status')->nullable(); // pending, disputed, success
             $table->boolean('result')->nullable(); // true if win false otherwies

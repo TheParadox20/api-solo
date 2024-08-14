@@ -27,8 +27,11 @@ class Categories extends Model
     /**
      * A static function that the id given the category name
      */
-    public static function getID($name){
-        $category = Categories::where('name', $name)->first();
+    public static function getID($name,$sport){
+        $category = Categories::where('name', $name)
+                        ->where('sport_id', $sport)
+                        ->first();
+        throw_if(!$category, \Exception::class, "Category not found");
         return $category->id;
     }
     public static function getName($id){
