@@ -28,6 +28,48 @@ class BetsController extends Controller
             ], 401);
         }
     }
+    public function edit(Request $request)
+    {
+        try{
+            $user = $request->user();
+            throw_if(!$user, \Exception::class, 'User unauthenticated');
+            return response()->json([
+                'message'=>'Bet modified'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([ 
+                'error' => $e->getMessage(),
+                'request'=>$request->all()
+            ], 401);
+        }
+    }
+    public function delete(Request $request)
+    {
+        try{
+            $user = $request->user();
+            throw_if(!$user, \Exception::class, 'User unauthenticated');
+            $bet = Bets::find($request->id);
+            throw_if(!$bet, \Exception::class, 'Bet not found');
+            $amount = $bet->amount*-1;
+            //update user balance
+            $user->balance = $user->balance - $amount;
+            $user->save();
+            //update game stats
+            $Game = \GameType::fromID($bet->game_id);
+            $Game->setRow($bet->game_id);
+            $Game->update($bet->choice, $amount);
+            $bet->delete();
+            return response()->json([
+                'message'=>'Bet deleted',
+                'amount'=>$amount*-1
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([ 
+                'error' => $e->getMessage(),
+                'request'=>$request->all()
+            ], 401);
+        }
+    }
      /**
       * Get active bets for a user
       * @param \Illuminate\Http\Request $request

@@ -24,6 +24,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/signin',
             'api/signup',
             'api/bet/place',
+            'api/bet/edit',
+            'api/bet/delete',
             'api/games/create',
         ]);
 

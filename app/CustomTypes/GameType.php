@@ -138,7 +138,7 @@ class GameType
     public function getPayout($choice, $stake){
         $stakes = $this->outcomes[$choice]->stake;
         $pot = $this->stakes-$stakes;
-        $award = ($stake/$stakes*$pot)+$stake;
+        $award = $stakes==0?(0*$pot)+$stake:($stake/$stakes*$pot)+$stake;
         return $award;
     }
 }
