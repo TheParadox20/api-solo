@@ -78,7 +78,9 @@ class GamesController extends Controller
           $games[$date] = Games::where('start_time','like',$dates[$i].'%')
                                       ->take(90)
                                       ->where('start_time','>',date('Y-m-d H:i:s'))
-                                      ->whereAny(['options',],'LIKE' , '%'.$request->search.'%')
+                                      ->where(function($query) use ($request) {
+                                          $query->whereRaw('LOWER(options) LIKE ?', ['%' . strtolower($request->search) . '%']);
+                                      })
                                       ->skip(0)
                                       ->orderByDesc('popularity')
                                       ->orderBy('start_time')
@@ -163,9 +165,9 @@ class GamesController extends Controller
               foreach($matches->data as $match){// loop through indiviadual games
                   try{
                       $outcomes = [
-                          ['name'=>$match->home_team,'stake'=>0.0,'users'=>0,'odd'=>$match->home_odd],
+                          ['name'=>GamesController::shorten($match->home_team),'stake'=>0.0,'users'=>0,'odd'=>$match->home_odd],
                           ['name'=>'Draw','stake'=>0.0,'users'=>0,'odd'=>$match->neutral_odd],
-                          ['name'=>$match->away_team,'stake'=>0.0,'users'=>0,'odd'=>$match->away_odd]
+                          ['name'=>GamesController::shorten($match->away_team),'stake'=>0.0,'users'=>0,'odd'=>$match->away_odd]
                       ];
                       $game = new \GameType(
                           Sports::getID($sport->sport_name=='Soccer'?'Football':$sport->sport_name),
@@ -185,5 +187,25 @@ class GamesController extends Controller
       return response()->json([
           'message'=> 'done'
       ]);
+  }
+
+
+  //helper functions
+  public static function shorten($teamName) {
+    $words = explode(' ', $teamName);
+    if (count($words) >= 3) {
+        return $words[0] . ' ' . strtoupper($words[1][0]) . '. ' . strtoupper($words[2][0]) . '.';
+    }
+    if (count($words) == 2) {
+        if (strlen($words[0]) > 3) {
+            return substr($words[0], 0, 3) . '. ' . $words[1];
+        }
+        return $words[0] . ' ' . substr($words[1], 0, 1) . '.';
+    }
+    if (strlen($teamName) > 10) {
+        return substr($teamName, 0, 8) . '...';
+    }
+
+    return $teamName;
   }
 }

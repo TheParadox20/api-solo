@@ -22,6 +22,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // bet related routes
     Route::post('/bet/place', [BetsController::class, 'place']);
     Route::get('/betslip', [BetsController::class, 'betslip']);
+    Route::get('/bets', [BetsController::class, 'bets']);
 });
 Route::post('/signin', [UserController::class, 'signin']);
 Route::post('/signup', [UserController::class, 'signup']);

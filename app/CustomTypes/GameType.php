@@ -105,8 +105,13 @@ class GameType
         $game->outcomes = json_encode($outcomes);
         $game->stakers = $amount>0?$game->stakers+1:$game->stakers-1;
         $game->amount = $game->amount + $amount;
-        //update popularity
-        $game->popularity = $game->popularity + $amount;
+        $game->popularity = $game->popularity + 1;
+        $sport = Sports::find($game->sport_id);
+        $sport->popularity = $sport->popularity + 1;
+        $sport->save();
+        $category = Categories::find($game->category_id);
+        $category->popularity = $category->popularity + 1;
+        $category->save();
         $game->save();
     }
 

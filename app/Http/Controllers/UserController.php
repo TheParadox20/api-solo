@@ -40,7 +40,10 @@ class UserController extends Controller
 
                 return response()->json([
                     'message' => 'Account created',
-                    'token' => $token
+                    'token' => $token,
+                    'name' => $user->name,
+                    'balance' => $user->balance,
+                    'phone' => $user->phone,
                 ]);
             }
             else {

@@ -75,6 +75,40 @@ class BetsController extends Controller
             ], 401);
         }
     }
+
+     /**
+      * Get all bets
+      * @param \Illuminate\Http\Request $request
+      * @return mixed|\Illuminate\Http\JsonResponse
+      */
+      public function bets(Request $request)
+      {
+          try{
+                $user = $request->user();
+                throw_if(!$user, \Exception::class, 'User unauthenticated');
+                $bets = Bets::where('user_id', $user->id)->get();
+                $bets = $bets->map(function($bet){
+                    $game = \GameType::fromID($bet->game_id);
+                    return [
+                        'betID' => strtoupper(substr($game->gameID, 0, 5)),
+                        'settled' => $bet->result==null?false:true,
+                        'market' => $bet->market,
+                        'homeTeam' => $game->options[0],
+                        'awayTeam' => $game->options[1],
+                        'stake' => $bet->amount,
+                        'choice' => $game->outcomes[$bet->choice]->name,
+                        'payout' => $bet->result==true || $bet->result==null?$game->getPayout($bet->choice, $bet->amount):0,
+                        'date'=>date('Y-m-d', strtotime($game->date)),
+                    ];
+                });
+              return response()->json($bets);
+          } catch (\Exception $e) {
+              return response()->json([ 
+                  'error' => $e->getMessage(),
+                  'request'=>$request->all()
+              ], 401);
+          }
+      }
     /**
      * Given a userID, gameID, amount, and outcome place a bet
      * @param \Illuminate\Http\Request $request
