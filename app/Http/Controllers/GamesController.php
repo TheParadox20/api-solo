@@ -76,7 +76,7 @@ class GamesController extends Controller
           $date = \DateTime::createFromFormat('Y-m-d', $dates[$i]);
           $date = $date->format('l, jS F Y');
           $games[$date] = Games::where('start_time','like',$dates[$i].'%')
-                                      ->take(90)
+                                      ->take(20)
                                       ->where('start_time','>',date('Y-m-d H:i:s'))
                                       ->where(function($query) use ($request) {
                                           $query->whereRaw('LOWER(options) LIKE ?', ['%' . strtolower($request->search) . '%']);
