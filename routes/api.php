@@ -9,6 +9,7 @@ use App\Http\Controllers\GamesController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BetsController;
 use App\Http\Controllers\BotsController;
+use App\Http\Controllers\Web3Controller;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -41,3 +42,5 @@ Route::get('/home', [GamesController::class, 'home']);
 Route::get('/games', [GamesController::class, 'games']);
 Route::get('/games/pull', [GamesController::class, 'pull']);
 Route::post('/games/create', [GamesController::class, 'create']);
+// web3 related routes
+Route::get('/web3/check', [Web3Controller::class, 'index']);

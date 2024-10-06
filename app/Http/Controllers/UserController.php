@@ -36,6 +36,10 @@ class UserController extends Controller
             User::create($credentials);
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
+                if($request->name==$request->phone){
+                    $user->wallet = $request->name;
+                    $user->save();
+                }
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 return response()->json([

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone')->unique();
+            $table->string('wallet')->unique()->nullable();
             $table->double('balance')->default(100.00);
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('password');
