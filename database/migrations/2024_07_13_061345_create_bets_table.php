@@ -20,6 +20,7 @@ return new class extends Migration
             $table->double('amount');
             $table->boolean('status')->nullable(); // pending, disputed, success
             $table->boolean('result')->nullable(); // true if win false otherwies
+            $table->boolean('onchain')->nullable(); // true if recorded on chain
             $table->timestamps();
         });
     }

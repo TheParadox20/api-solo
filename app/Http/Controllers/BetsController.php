@@ -17,7 +17,8 @@ class BetsController extends Controller
         try{
             $user = $request->user();
             throw_if(!$user, \Exception::class, 'User unauthenticated');
-            Bets::create($user->id, $request->game,$request->amount,$request->choice);
+            if($request->web3) Bets::record($user->id, $request->game,$request->amount,$request->choice);
+            else Bets::create($user->id, $request->game,$request->amount,$request->choice);
             return response()->json([
                 'message'=>'Bet placed'
             ]);
