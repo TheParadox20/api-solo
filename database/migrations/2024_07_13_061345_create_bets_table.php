@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('market')->default('3 way');
             $table->string('choice');
             $table->double('amount');
+            $table->double('reward')->nullable();
             $table->boolean('status')->nullable(); // pending, disputed, success
             $table->boolean('result')->nullable(); // true if win false otherwies
             $table->boolean('onchain')->nullable(); // true if recorded on chain

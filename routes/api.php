@@ -11,6 +11,7 @@ use App\Http\Controllers\BetsController;
 use App\Http\Controllers\BotsController;
 use App\Http\Controllers\Web3Controller;
 use App\Http\Controllers\P2EController;
+use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
@@ -48,3 +49,7 @@ Route::get('/p2e', [P2EController::class, 'index']);
 // web3 related routes
 Route::get('/web3/check', [Web3Controller::class, 'index']);
 Route::get('/web3/block', [Web3Controller::class, 'getLatestBlock']);
+//admin related routes
+Route::get('/bets/active', [AdminController::class, 'getActiveBets']);
+Route::get('/bet/close', [AdminController::class, 'closeBet']);
+Route::get('/bets/info', [BetsController::class, 'BetInfo']);

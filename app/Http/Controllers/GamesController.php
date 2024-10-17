@@ -42,21 +42,42 @@ class GamesController extends Controller
   }
   public function home(Request $request)
   {
-      $sports = Sports::orderByDesc('popularity')->take(2)->get(['id','name']);
-      $popular = [];
-      foreach ($sports as $sport) {
-        // games where start_time is greater than now
-        $games = Games::where('sport_id',$sport['id'])
-                      ->where('start_time','>',date('Y-m-d H:i:s'))
-                      ->orderByDesc('popularity')
-                      ->orderBy('start_time')
-                      ->take(2)
-                      ->get(['id']);
-        $popular[$sport['name']] = array_map(function($game){
-        return \GameType::fromID($game['id'])->package();
-        }, $games->toArray());
-      }
-      return response()->json($popular);
+    $image_url = url('bets/p2e/election.png');
+    $market1 = [
+      'thumbnail'=> $image_url,
+      'title'=>'Presidential Election Winner',
+      'stakes'=>12740,
+      'options'=>[
+        ['name'=>'Joe Biden', 'percentage'=>12],
+        ['name'=>'Donald Trump', 'percentage'=>15],
+        ['name'=>'Kanye West', 'percentage'=>20]
+      ],
+      'chats'=>324
+    ];
+    $market2 = [
+        'thumbnail'=> $image_url,
+        'title'=>'Presidential Election Winner',
+        'stakes'=>69740,
+        'chats'=>715
+    ];
+    $sports = Sports::orderByDesc('popularity')->take(2)->get(['id','name']);
+    $popular = [];
+    foreach ($sports as $sport) {
+      // games where start_time is greater than now
+      $games = Games::where('sport_id',$sport['id'])
+                    ->where('start_time','>',date('Y-m-d H:i:s'))
+                    ->orderByDesc('popularity')
+                    ->orderBy('start_time')
+                    ->take(2)
+                    ->get(['id']);
+      $popular[$sport['name']] = array_map(function($game){
+      return \GameType::fromID($game['id'])->package();
+      }, $games->toArray());
+    }
+    return response()->json([
+      'popular' => $popular,
+      'p2e' => [$market1,$market2]
+    ]);
   }
   public function games(Request $request)
   {

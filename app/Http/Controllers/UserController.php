@@ -18,6 +18,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'phone' => $user->phone,
                 'balance' => $user->balance,
+                'web3' => $user->wallet!=null,
             ]);
         } else {
             return response()->json(['error' => 'Not Authenticated'], 401);
@@ -36,7 +37,7 @@ class UserController extends Controller
             User::create($credentials);
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
-                if($request->name==$request->phone){
+                if ($request->name == $request->phone && strlen($request->name) == 42 && strpos($request->name, '0x') === 0) {
                     $user->wallet = $request->name;
                     $user->save();
                 }
@@ -48,6 +49,7 @@ class UserController extends Controller
                     'name' => $user->name,
                     'balance' => $user->balance,
                     'phone' => $user->phone,
+                    'web3' => $user->wallet!=null,
                 ]);
             }
             else {
@@ -83,6 +85,7 @@ class UserController extends Controller
                 'name' => $user->name,
                 'balance' => $user->balance,
                 'phone' => $user->phone,
+                'web3' => $user->wallet!=null,
             ]);
         } catch (\Exception $e) {
             return response()->json([ 

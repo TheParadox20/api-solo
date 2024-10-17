@@ -11,7 +11,7 @@ use App\Models\User;
 class Bets extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'game_id', 'market', 'choice', 'amount', 'status', 'result','onchain'];
+    protected $fillable = ['user_id', 'game_id', 'market', 'choice', 'amount', 'status', 'result','onchain','reward'];
     public static function create($user, $game, $amount, $choice){
         throw_if(Bets::where('game_id', $game)->where('user_id', $user)->first(), \Exception::class, 'Bet exists');
         $user = User::find($user);

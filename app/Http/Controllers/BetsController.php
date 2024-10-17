@@ -174,4 +174,21 @@ class BetsController extends Controller
             ], 401);
         }
     }
+    /**
+     * Given gameID return bet info
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function BetInfo(Request $request){
+        try{
+            $game = Games::find($request->id);
+            $outcomes = json_decode($game->outcomes);
+            return response()->json($outcomes);
+        } catch (\Exception $e) {
+            return response()->json([ 
+                'error' => $e->getMessage(),
+                'request'=>$request->all()
+            ], 401);
+        }
+    }
 }
