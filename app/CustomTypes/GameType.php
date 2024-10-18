@@ -94,7 +94,10 @@ class GameType
     /**
      * function to modify a record on placing a bet
      */
-    public function update($choice, $amount){
+    public function update($option, $amount){
+        if($option == 1) $choice = 0; //home
+        if($option == 0) $choice = 1; //draw
+        if($option == 2) $choice = 2; //away
         $game = Games::find($this->id);
         $outcomes = json_decode($game->outcomes);
         $outcome = $outcomes[$choice];

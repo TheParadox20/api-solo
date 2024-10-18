@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/bet/delete', [BetsController::class, 'delete']);
     Route::get('/betslip', [BetsController::class, 'betslip']);
     Route::get('/bets', [BetsController::class, 'bets']);
+    Route::get('/web3/connect', [Web3Controller::class, 'connect']);
 });
 Route::post('/signin', [UserController::class, 'signin']);
 Route::post('/signup', [UserController::class, 'signup']);
@@ -53,3 +54,5 @@ Route::get('/web3/block', [Web3Controller::class, 'getLatestBlock']);
 Route::get('/bets/active', [AdminController::class, 'getActiveBets']);
 Route::get('/bet/close', [AdminController::class, 'closeBet']);
 Route::get('/bets/info', [BetsController::class, 'BetInfo']);
+Route::get('/bets/payouts', [AdminController::class, 'payouts']);
+Route::get('/web3/settle', [Web3Controller::class, 'settle']);

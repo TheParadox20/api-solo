@@ -85,6 +85,9 @@ class BetsController extends Controller
             $bets = Bets::where('user_id', $user->id)->where('status', null)->get();
             $bets = $bets->map(function($bet){
                 $game = \GameType::fromID($bet->game_id);
+                if($bet->choice == 1) $choice = 0; //home
+                if($bet->choice == 0) $choice = 1; //draw
+                if($bet->choice == 2) $choice = 2; //away
                 $game->setRow($bet->game_id);
                 $live = Live::where('game_id', $bet->game_id)->first();
                 $status = $live?
@@ -105,8 +108,8 @@ class BetsController extends Controller
                     'awayTeam' => $game->options[1],
                     'start' => $game->time,
                     'stake' => $bet->amount,
-                    'choice' => $game->outcomes[$bet->choice]->name,
-                    'payout' => $game->getPayout($bet->choice, $bet->amount),
+                    'choice' => $game->outcomes[$choice]->name,
+                    'payout' => $game->getPayout($choice, $bet->amount),
                     'status' => $status
                 ];
             });
@@ -132,15 +135,18 @@ class BetsController extends Controller
                 $bets = Bets::where('user_id', $user->id)->get();
                 $bets = $bets->map(function($bet){
                     $game = \GameType::fromID($bet->game_id);
+                    if($bet->choice == 1) $choice = 0; //home
+                    if($bet->choice == 0) $choice = 1; //draw
+                    if($bet->choice == 2) $choice = 2; //away
                     return [
                         'betID' => strtoupper(substr($game->gameID, 0, 5)),
-                        'settled' => $bet->result==null?false:true,
+                        'settled' => $bet->status==true?true:false,
                         'market' => $bet->market,
                         'homeTeam' => $game->options[0],
                         'awayTeam' => $game->options[1],
                         'stake' => $bet->amount,
                         'choice' => $game->outcomes[$bet->choice]->name,
-                        'payout' => $bet->result==true || $bet->result==null?$game->getPayout($bet->choice, $bet->amount):0,
+                        'payout' => $bet->result==true || $bet->result==null?$game->getPayout($choice, $bet->amount):0,
                         'date'=>date('Y-m-d', strtotime($game->date)),
                     ];
                 });
